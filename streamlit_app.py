@@ -94,14 +94,17 @@ st.pyplot(fig3)
 
 st.header("4️⃣ Player Age vs Performance Drop Index")
 
+# Use absolute values for marker size so Plotly doesn't crash
+df_summary["Size_Positive"] = df_summary["Team_Performance_Drop"].abs()
+
 fig4 = px.scatter(
     df_summary,
     x="Age",
     y="Team_Performance_Drop",
     color="Team_Performance_Drop",
-    size="Team_Performance_Drop",
+    size="Size_Positive",
     hover_name="Name",
-    title="Age vs Team Performance Drop",
+    title="Age vs Team Performance Drop (Marker Size = |Drop|)",
 )
 st.plotly_chart(fig4, use_container_width=True)
 
