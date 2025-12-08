@@ -14,27 +14,28 @@ st.title("⚽ Injury Impact Analytics Dashboard")
 st.write("Interactive analytics using player injury metrics and recovery data.")
 
 # -------------------------------------------------------
-# PATCH: Add Age into df_summary
-# -------------------------------------------------------
-df_age = df[["Name", "Age"]].drop_duplicates()   # extract player ages
-df_summary = df_summary.merge(df_age, on="Name", how="left")
-
-# -------------------------------------------------------
 # VISUAL 1 — Bar Chart: Top 10 Injuries With Highest Team Performance Drop
 # -------------------------------------------------------
 
 st.header("1️⃣ Top 10 Injuries With Highest Team Performance Drop")
 
-top10_drop = df_summary.nlargest(10, "Team_Performance_Drop")
+# Compute injury-level drop (per injury event)
+df["Injury_Performance_Drop"] = df["Team_Avg_GD_Missed"] - df["Team_Avg_GD_Before"]
+
+# Sort and select top 10
+top10_injuries = df.sort_values(by="Injury_Performance_Drop", ascending=True).head(10)
 
 fig1 = px.bar(
-    top10_drop,
+    top10_injuries,
     x="Name",
-    y="Team_Performance_Drop",
-    color="Team_Performance_Drop",
-    title="Top 10 Team Performance Drops Due to Injury",
+    y="Injury_Performance_Drop",
+    hover_data=["Team Name", "Date of Injury", "Team_Avg_GD_Before", "Team_Avg_GD_Missed"],
+    color="Injury_Performance_Drop",
+    title="Top 10 Injuries With Highest Team Performance Drop (Event-Level)",
 )
+
 st.plotly_chart(fig1, use_container_width=True)
+
 
 # -------------------------------------------------------
 # VISUAL 2 — Line Chart: Player Performance Timeline
