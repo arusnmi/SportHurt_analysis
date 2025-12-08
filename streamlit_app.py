@@ -94,19 +94,30 @@ st.pyplot(fig3)
 
 st.header("4️⃣ Player Age vs Performance Drop Index")
 
-# Use absolute values for marker size so Plotly doesn't crash
-df_summary["Size_Positive"] = df_summary["Team_Performance_Drop"].abs()
+# Clean data for plotting
+df_scatter = df_summary.copy()
+
+# Compute positive marker sizes
+df_scatter["Size_Positive"] = df_scatter["Team_Performance_Drop"].abs()
+
+# Replace NaN values with 0 to avoid Plotly errors
+df_scatter["Size_Positive"] = df_scatter["Size_Positive"].fillna(0)
+
+# Also ensure Age is numeric
+df_scatter["Age"] = pd.to_numeric(df_scatter["Age"], errors="coerce")
+df_scatter = df_scatter.dropna(subset=["Age"])
 
 fig4 = px.scatter(
-    df_summary,
+    df_scatter,
     x="Age",
     y="Team_Performance_Drop",
     color="Team_Performance_Drop",
     size="Size_Positive",
     hover_name="Name",
-    title="Age vs Team Performance Drop (Marker Size = |Drop|)",
+    title="Age vs Team Performance Drop (Bubble size = impact magnitude)",
 )
 st.plotly_chart(fig4, use_container_width=True)
+
 
 # -------------------------------------------------------
 # VISUAL 5 — Leaderboard: Comeback Rating Improvement
