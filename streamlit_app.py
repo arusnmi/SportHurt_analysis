@@ -14,33 +14,39 @@ st.title("⚽ Injury Impact Analytics Dashboard")
 st.write("Interactive analytics using player injury metrics and recovery data.")
 
 # -------------------------------------------------------
-# VISUAL 1 — Bar Chart: Top 10 Injuries With Highest Team Performance Drop
+# VISUAL 1 — Bar Chart: Top 10 Injury Types by Average Performance Drop
 # -------------------------------------------------------
 
-st.header("1️⃣ Top 10 Injuries With Highest Team Performance Drop")
+st.header("1️⃣ Top 10 Injury Types by Average Team Performance Drop")
 
-# 1. Calculate Drop: (GD Before) - (GD During Absence)
-# Positive value means the team performed WORSE without the player.
-# We use the correct column names from your cleaned_with_metrics.csv file.
-df["Injury_Performance_Drop"] = df["Avg_GD_Before_Injury"] - df["Avg_GD_Missed_Matches"]
+# 1. Calculate Drop per event: (GD Before) - (GD During Absence)
+# Positive value = Team performed worse.
+df["Event_Drop"] = df["Avg_GD_Before_Injury"] - df["Avg_GD_Missed_Matches"]
 
-# 2. Sort Descending to get the "Highest" drops at the top
-top10_injuries = df.sort_values(by="Injury_Performance_Drop", ascending=False).head(10)
+# 2. Group by 'Injury' and calculate the mean drop for each type
+injury_groups = df.groupby("Injury")["Event_Drop"].mean().reset_index()
 
-# 3. Create the Bar Chart
+# 3. Rename columns for clarity
+injury_groups = injury_groups.rename(columns={"Event_Drop": "Avg_Performance_Drop"})
+
+# 4. Sort Descending to find the injury types with the highest average drop
+top10_injury_types = injury_groups.sort_values(by="Avg_Performance_Drop", ascending=False).head(10)
+
+# 5. Create the Bar Chart
 fig1 = px.bar(
-    top10_injuries,
-    x="Name",
-    y="Injury_Performance_Drop",
-    # Add context on hover so you can see the before/during stats
-    hover_data=["Team Name", "Date of Injury", "Avg_GD_Before_Injury", "Avg_GD_Missed_Matches"],
-    color="Injury_Performance_Drop",
-    title="Top 10 Injuries With Highest Team Performance Drop (Event-Level)",
-    labels={"Injury_Performance_Drop": "Performance Drop (GD Decrease)"}
+    top10_injury_types,
+    x="Injury",
+    y="Avg_Performance_Drop",
+    color="Avg_Performance_Drop",
+    title="Top 10 Injury Types by Average Team Performance Drop",
+    labels={"Avg_Performance_Drop": "Average Drop in Goal Difference"},
 )
 
-st.plotly_chart(fig1, use_container_width=True)
+# 6. Hide the legend (and color bar if preferred, though color bar is usually helpful)
+fig1.update_layout(showlegend=False)
+fig1.update_coloraxes(showscale=False) # Hides the color scale bar on the side
 
+st.plotly_chart(fig1, use_container_width=True)
 # -------------------------------------------------------
 # VISUAL 2 — Line Chart: Player Performance Timeline
 # -------------------------------------------------------
