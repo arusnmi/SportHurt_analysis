@@ -20,7 +20,8 @@ st.write("Interactive analytics using player injury metrics and recovery data.")
 st.header("1️⃣ Top 10 Injuries With Highest Team Performance Drop")
 
 # Compute injury-level drop (per injury event)
-df["Injury_Performance_Drop"] = df["Team_Avg_GD_Missed"] - df["Team_Avg_GD_Before"]
+# CORRECTED: Using 'Avg_GD_Missed_Matches' and 'Avg_GD_Before_Injury'
+df["Injury_Performance_Drop"] = df["Avg_GD_Missed_Matches"] - df["Avg_GD_Before_Injury"]
 
 # Sort and select top 10
 top10_injuries = df.sort_values(by="Injury_Performance_Drop", ascending=True).head(10)
@@ -29,13 +30,12 @@ fig1 = px.bar(
     top10_injuries,
     x="Name",
     y="Injury_Performance_Drop",
-    hover_data=["Team Name", "Date of Injury", "Team_Avg_GD_Before", "Team_Avg_GD_Missed"],
+    # CORRECTED: Updated hover data columns to match the dataframe
+    hover_data=["Team Name", "Date of Injury", "Avg_GD_Before_Injury", "Avg_GD_Missed_Matches"],
     color="Injury_Performance_Drop",
     title="Top 10 Injuries With Highest Team Performance Drop (Event-Level)",
 )
-
 st.plotly_chart(fig1, use_container_width=True)
-
 
 # -------------------------------------------------------
 # VISUAL 2 — Line Chart: Player Performance Timeline
