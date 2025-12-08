@@ -1,19 +1,20 @@
-# :earth_americas: GDP dashboard template
+# SportHurt analysis: Project analysis 
 
-A simple Streamlit app showing the GDP of different countries in the world.
+This project is designed to analyse the effect an ingury has on a football player during a leauge, it anlaysies the performance drop of the player while he is ingured, and it also analyses the the teams performance when the player is off the feild injured, and what their performance is after the ingury. It also clacluates which ingury has the higest performance drop for both 
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://gdp-dashboard-template.streamlit.app/)
 
-### How to run it on your own machine
+# Key fetures
 
-1. Install the requirements
+Barchart for team performance drop: using the avrage GD per match befroe and after ingury, and based on ingury the highest goal diffrnece with that ingury will get recorded. 
 
-   ```
-   $ pip install -r requirements.txt
-   ```
+Intractive line graph: showing a line graph for each player in the leauge for their performance before and after ingury
 
-2. Run the app
+Heatmap of clubs and inguries per month: analyses the ingury fequrency in diffrent clubs
 
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+Scatter plot of every player: alnalyses the avrage performance drop of all players
+
+Leaderboard of Combacks: list of players and how good they came back after ingury
+
+# Live link
+
+
