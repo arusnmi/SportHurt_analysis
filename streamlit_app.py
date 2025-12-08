@@ -14,37 +14,38 @@ st.title("⚽ Injury Impact Analytics Dashboard")
 st.write("Interactive analytics using player injury metrics and recovery data.")
 
 # -------------------------------------------------------
-# VISUAL 1 — Bar Chart: Top 10 Injury Types by Average Performance Drop
+# VISUAL 1 — Bar Chart: Top 10 Injuries With Highest Average Team Performance Drop
 # -------------------------------------------------------
 
-st.header("1️⃣ Top 10 Injury Types by Average Team Performance Drop")
+st.header("1️⃣ Top 10 Injuries With Highest Average Team Performance Drop")
 
-# 1. Calculate Drop per event: (GD Before) - (GD During Absence)
-# Positive value = Team performed worse.
-df["Event_Drop"] = df["Avg_GD_Before_Injury"] - df["Avg_GD_Missed_Matches"]
+# 1. Calculate Performance Drop for each incident: (GD Before) - (GD During Absence)
+# Positive value means the team performed WORSE without the player.
+# We use the correct column names from cleaned_with_metrics.csv.
+df["Injury_Performance_Drop"] = df["Avg_GD_Before_Injury"] - df["Avg_GD_Missed_Matches"]
 
-# 2. Group by 'Injury' and calculate the mean drop for each type
-injury_groups = df.groupby("Injury")["Event_Drop"].mean().reset_index()
+# 2. Aggregate the drop by the Injury type and calculate the average drop
+# This step calculates the average performance drop for each unique injury type, regardless of player or team.
+injury_drop_summary = df.groupby("Injury", dropna=True)["Injury_Performance_Drop"].mean().reset_index()
 
-# 3. Rename columns for clarity
-injury_groups = injury_groups.rename(columns={"Event_Drop": "Avg_Performance_Drop"})
+# 3. Sort descending to get the 'Highest' average drops at the top and select Top 10
+top10_injury_types = injury_drop_summary.sort_values(
+    by="Injury_Performance_Drop",
+    ascending=False
+).head(10)
 
-# 4. Sort Descending to find the injury types with the highest average drop
-top10_injury_types = injury_groups.sort_values(by="Avg_Performance_Drop", ascending=False).head(10)
-
-# 5. Create the Bar Chart
+# 4. Create the Bar Chart using the aggregated data
 fig1 = px.bar(
     top10_injury_types,
-    x="Injury",
-    y="Avg_Performance_Drop",
-    color="Avg_Performance_Drop",
-    title="Top 10 Injury Types by Average Team Performance Drop",
-    labels={"Avg_Performance_Drop": "Average Drop in Goal Difference"},
+    x="Injury",  # Use injury type as the X-axis
+    y="Injury_Performance_Drop",
+    color="Injury_Performance_Drop", # Use color scale based on the drop value
+    title="Top 10 Injuries With Highest Average Team Performance Drop",
+    labels={"Injury_Performance_Drop": "Average Performance Drop (GD Decrease)", "Injury": "Injury Type"},
 )
 
-# 6. Hide the legend (and color bar if preferred, though color bar is usually helpful)
+# Remove the legend as requested
 fig1.update_layout(showlegend=False)
-fig1.update_coloraxes(showscale=False) # Hides the color scale bar on the side
 
 st.plotly_chart(fig1, use_container_width=True)
 # -------------------------------------------------------
