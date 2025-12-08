@@ -14,6 +14,12 @@ st.title("⚽ Injury Impact Analytics Dashboard")
 st.write("Interactive analytics using player injury metrics and recovery data.")
 
 # -------------------------------------------------------
+# PATCH: Add Age into df_summary
+# -------------------------------------------------------
+df_age = df[["Name", "Age"]].drop_duplicates()   # extract player ages
+df_summary = df_summary.merge(df_age, on="Name", how="left")
+
+# -------------------------------------------------------
 # VISUAL 1 — Bar Chart: Top 10 Injuries With Highest Team Performance Drop
 # -------------------------------------------------------
 
@@ -107,8 +113,8 @@ st.header("5️⃣ Comeback Leaderboard (Rating Improvement After Injury)")
 
 leaderboard = df_summary.sort_values(
     by="Player_Rating_Delta", ascending=False
-)[["Name", "Player_Rating_Delta", 
-   "Player_Avg_Rating_Before_Injury", 
+)[["Name", "Player_Rating_Delta",
+   "Player_Avg_Rating_Before_Injury",
    "Player_Avg_Rating_After_Injury"]]
 
 st.dataframe(leaderboard, use_container_width=True)
