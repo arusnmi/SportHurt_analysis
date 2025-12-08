@@ -17,4 +17,9 @@ Leaderboard of Combacks: list of players and how good they came back after ingur
 
 # Live link
 
+[steramlit app](https://sporthurt-analysis-bgjddtw22ev.streamlit.app)
+
+# Scereenshots
+
+avaible in the scereenshot folder
 
