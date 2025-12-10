@@ -104,10 +104,16 @@ st.pyplot(fig3)
 # VISUAL 4 — Scatter Plot: Player Age vs Performance Drop
 # -------------------------------------------------------
 
-st.header("4️⃣ Player Age vs Performance Drop Index")
+st.header("4️⃣ Player Age vs Team Performance Drop Index")
 
 # Clean data for plotting
 df_scatter = df_summary.copy()
+
+# FIX: The 'Age' column is in the 'df' (cleaned_with_metrics.csv) file, not 'df_summary'.
+# We must extract unique Name and Age pairs from 'df' and merge them into 'df_scatter'.
+age_data = df[["Name", "Age"]].drop_duplicates()
+df_scatter = df_scatter.merge(age_data, on="Name", how="left")
+
 
 # Compute positive marker sizes
 df_scatter["Size_Positive"] = df_scatter["Team_Performance_Drop"].abs()
@@ -115,9 +121,10 @@ df_scatter["Size_Positive"] = df_scatter["Team_Performance_Drop"].abs()
 # Replace NaN values with 0 to avoid Plotly errors
 df_scatter["Size_Positive"] = df_scatter["Size_Positive"].fillna(0)
 
-# Also ensure Age is numeric
+# The 'Age' column is now available via the merge.
+# We ensure it is numeric (though it should be from the source file, this is good practice)
 df_scatter["Age"] = pd.to_numeric(df_scatter["Age"], errors="coerce")
-df_scatter = df_scatter.dropna(subset=["Age"])
+df_scatter = df_scatter.dropna(subset=["Age", "Team_Performance_Drop"]) # Drop NaN Age and Drop Index values for plotting
 
 fig4 = px.scatter(
     df_scatter,
@@ -127,6 +134,7 @@ fig4 = px.scatter(
     size="Size_Positive",
     hover_name="Name",
     title="Age vs Team Performance Drop (Bubble size = impact magnitude)",
+    labels={"Team_Performance_Drop": "Team Performance Drop (GD Change)"}
 )
 st.plotly_chart(fig4, use_container_width=True)
 
