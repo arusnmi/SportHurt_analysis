@@ -101,43 +101,45 @@ sns.heatmap(pivot, cmap="Reds", annot=True, fmt="g", ax=ax)
 st.pyplot(fig3)
 
 # -------------------------------------------------------
-# VISUAL 4 — Scatter Plot: Player Age vs Performance Drop
+# VISUAL 4 — Scatter Plot: Player Age vs Player Performance Drop
 # -------------------------------------------------------
 
-st.header("4️⃣ Player Age vs Team Performance Drop Index")
+st.header("4️⃣ Player Age vs Player Performance Drop Index")
 
 # Clean data for plotting
 df_scatter = df_summary.copy()
 
 # FIX: The 'Age' column is in the 'df' (cleaned_with_metrics.csv) file, not 'df_summary'.
-# We must extract unique Name and Age pairs from 'df' and merge them into 'df_scatter'.
+# We extract unique Name and Age pairs from 'df' and merge them into 'df_scatter'.
 age_data = df[["Name", "Age"]].drop_duplicates()
 df_scatter = df_scatter.merge(age_data, on="Name", how="left")
 
+# The 'Age' column is now available via the merge.
+df_scatter["Age"] = pd.to_numeric(df_scatter["Age"], errors="coerce")
 
-# Compute positive marker sizes
-df_scatter["Size_Positive"] = df_scatter["Team_Performance_Drop"].abs()
+
+# --- NEW LOGIC: Use Player_Rating_Delta for Y-axis and Size ---
+# The metric for player performance drop is 'Player_Rating_Delta' (After - Before).
+# Negative Delta means a drop in player rating.
+df_scatter["Size_Positive"] = df_scatter["Player_Rating_Delta"].abs()
 
 # Replace NaN values with 0 to avoid Plotly errors
 df_scatter["Size_Positive"] = df_scatter["Size_Positive"].fillna(0)
 
-# The 'Age' column is now available via the merge.
-# We ensure it is numeric (though it should be from the source file, this is good practice)
-df_scatter["Age"] = pd.to_numeric(df_scatter["Age"], errors="coerce")
-df_scatter = df_scatter.dropna(subset=["Age", "Team_Performance_Drop"]) # Drop NaN Age and Drop Index values for plotting
+# Drop NaN Age and Player_Rating_Delta values for plotting
+df_scatter = df_scatter.dropna(subset=["Age", "Player_Rating_Delta"]) 
 
 fig4 = px.scatter(
     df_scatter,
     x="Age",
-    y="Team_Performance_Drop",
-    color="Team_Performance_Drop",
-    size="Size_Positive",
+    y="Player_Rating_Delta", # Changed from Team_Performance_Drop
+    color="Player_Rating_Delta", # Changed from Team_Performance_Drop
+    size="Size_Positive",       # Changed to Player_Rating_Delta.abs()
     hover_name="Name",
-    title="Age vs Team Performance Drop (Bubble size = impact magnitude)",
-    labels={"Team_Performance_Drop": "Team Performance Drop (GD Change)"}
+    title="Age vs Player Rating Delta (Bubble size = magnitude of change)",
+    labels={"Player_Rating_Delta": "Player Rating Delta (After - Before)"} # Updated Label
 )
 st.plotly_chart(fig4, use_container_width=True)
-
 
 # -------------------------------------------------------
 # VISUAL 5 — Leaderboard: Comeback Rating Improvement
