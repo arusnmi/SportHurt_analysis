@@ -52,3 +52,10 @@ this project intracts with steramlit with
 
 * plotly for intractable graphs on steramlit
 
+
+### Notes
+
+When booting the app after rebooting it, an error can poup up saying that ther was an error with the app, this is because of some steramlit bloatware that didnot inizlize properly, so it gives an error, but the app is completly fine and works as intended, so that error is meaningless. 
+
+
+
